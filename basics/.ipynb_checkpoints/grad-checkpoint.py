@@ -93,19 +93,11 @@ class Multiply(Operation):
     def partial_a(self):
         """ Returns d(a * b)/da as int or float"""
         return self.b.data
-        # self.a.backprop()
-        # self.b.backprop()
-        # print(self.b.data , self.a.grad, self.a.data ,self.b.grad)
-        # return self.b.data * self.a.grad + self.a.data * self.b.grad
-    
+ 
     def partial_b(self):
         """ Returns d(a * b)/db as int or float"""
         return self.a.data
-        # self.a.backprop()
-        # self.b.backprop()
-        # return self.b.data * self.a.grad + self.a.data * self.b.grad
-
-
+ 
 class Subtract(Operation):
     def __repr__(self): return "-"
 
@@ -211,9 +203,9 @@ class Number(object):
                 to 'retrace' back through the graph.
                 
                 Note: creator must be specified as a named variable: i.e. Number(2, creator=ref)"""
-        # if not isinstance(obj, (Number, int, float, np.generic)) or (isinstance(obj, (np.ndarray)) and obj.ndim == 0):
-        #     print(obj, type(obj))
-        assert isinstance(obj, (Number, int, float, np.generic)) or (isinstance(obj, (np.ndarray)) and obj.ndim == 0)
+        if not ((isinstance(obj, (Number, int, float, np.generic))) or (isinstance(obj, (np.ndarray)) and obj.ndim == 0)):
+            print(obj, type(obj))
+        assert (isinstance(obj, (Number, int, float, np.generic)) or (isinstance(obj, (np.ndarray)) and obj.ndim == 0))
         self.data = obj.data if isinstance(obj, Number) else obj
         self._creator = creator
         self.grad = None
@@ -328,7 +320,6 @@ class Number(object):
         """tells its creator to backprop the two numbers that went into creating it"""
         if self.grad == None:
             self.grad = 1
-            # print("this should only print once")
         if self.creator != None:
             self.creator.backprop_single(self.grad)
                                   
