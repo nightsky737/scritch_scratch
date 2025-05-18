@@ -20,18 +20,52 @@ def relu(x):
     # print(x)
     def relu_one(k):
         if k <= 0:
-            return 10e-3 * k
+            return 10e-2 * k
         else:
             return k
     return np.vectorize(lambda x: relu_one(x))(x)
 
-def softmax(x):
-    '''uh what is x? That's a good question.
 
-    X will be the shape (batch_size, output_size) output. We then want to run softmax over every entry in the 0 axis. 
-    '''
 
 def topo_sort(N):
+    '''Returns the correct order to backprop N in. This is such that if you call backprop(N), the gradient on N is final.
+    returns a list of Numbers.
+    
+    So ideally we'd just backprop one layer (to N's two creators (ie a and b when u backprop N in a * b = N) when we get to the N 
+
+    This will do a big stupid if a node appears twice (it will schedule the ones that appear twice to run its backprop when we first encounter them, not taking into account the second time), but the only ones that appear twice are weights and biases and those don't have anything after it that depends on the gradietns of weights and biases
+    '''
+    ret = []
+    visited = {}
+    stk=[(N, False)]
+    while(len(stk) != 0):
+        number, post = stk.pop()
+        # print(number)
+        '''
+        dfs's a Number, following it down the path by df'sing its two creators.
+        '''
+        if post:
+            ret.append(number)
+            continue
+            
+        if visited.get(number)== "visited":
+            continue
+        if visited.get(number) == "visiting":
+            print("ahahaaha uve gota cyelc")
+            continue
+            
+        visited[number] = "visiting"
+        
+        if number.creator != None:
+            stk.append((number.creator.a, False))
+            stk.append((number.creator.b, False))
+
+        stk.append((number, True))
+        visited[number] = "visited"
+        
+    return ret
+
+def old_sort(N):
     '''Returns the correct order to backprop N in. This is such that if you call backprop(N), the gradient on N is final.
     returns a list of Numbers.
     
@@ -64,7 +98,8 @@ def topo_sort(N):
     dfs(N)
     ret.reverse()
     return ret
-        
+ 
+    
 class Model():
         
     def __init__(self, input_size, output_size, hidden_layers, naive=False, seed=None):
@@ -122,38 +157,38 @@ class Model():
         '''
         num_correct = 0
         losses = []
+        weight_sizes = []
         for i in range(len(y)):
                     
             pred = self.fd(x[i])
-            # print("preds")
-            # print(pred.shape)
+ 
             y = np.array(y)
-            #wait what am i doing feeding logits in here edit: nvm they're not logits.
-
-            #but we do have a massive issue w/ mse calculations.....
-            #RIP to my computational graph idk what happened here but the backprop is gone.
-            mse = np.sum(pred * pred - 2 * pred * y + y * y)/(len(pred) * len(y))
-
-            num_correct += np.argmax(pred, axis=1) == np.argmax(y[i], axis=1)
-            losses.append(mse)
-            print("mse", mse)
-            mse_sorted = topo_sort(mse)
-            print(f"order {mse_sorted}")
-
-            print(f"sanity check on x {pred[0][0].creator.a}") #oh jeez this is not good. a.creator is None
-            for num in mse_sorted:
-                num.backprop_single()
-                
-            # for layer in self.layers:
-            #     for w in layer.flat:
-            #         if w.grad == None:
-            #             print('ur kidding')
-
-            # for bias in self.biases:
-            #     for b in bias.flat:
-            #         b.null_gradients(recursive=False)
 
             
+            for layer in self.layers:
+                 for w in layer.flat:
+                     w.null_gradients(recursive=False)
+ 
+            for bias in self.biases:
+                 for b in bias.flat:
+                     b.null_gradients(recursive=False)
+            
+            #but we do have a massive issue w/ mse calculations.....
+            mse = np.sum(pred * pred - 2 * pred * y + y * y)/(len(pred) * len(y))
+
+            num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
+            losses.append(mse)
+            # print("mse", mse)
+            mse_sorted = topo_sort(mse)
+            weight_sizes.append(len(mse_sorted))
+
+             # print(f"order {mse_sorted}")
+             # update step
+            for num in mse_sorted:
+                num.backprop_single()
+
+            for i, layer in enumerate(self.layers):
+                print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
             for i, layer in enumerate(self.layers):
                 for w in range(len(layer.flat)):
                     layer.flat[w] = Number(layer.flat[w] - layer.flat[w].grad * lr)
@@ -162,8 +197,9 @@ class Model():
                 layer = self.biases[i]
                 for b in range(len(layer.flat)):
                     layer.flat[b] = Number( layer.flat[b] - layer.flat[b].grad * lr)
-                    
-        print(f"Acc: {num_correct/len(y)} Avg loss: {sum(losses)/len(y)}")
+ 
+        print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
+        return losses, weight_sizes 
  
     def print_info(self, verbose=True):
         print("layers " )

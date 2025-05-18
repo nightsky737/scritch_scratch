@@ -324,8 +324,7 @@ class Number(object):
             self.creator.backprop_single(self.grad)
                                   
     def null_gradients(self, recursive = True):
-        if self.grad == None:
-            return
+        
         self.grad = None
         if self._creator is not None and recursive:
             self._creator.null_gradients()
