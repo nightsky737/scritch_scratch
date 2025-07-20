@@ -158,7 +158,6 @@ class Power(Operation):
 
     def __call__(self, a, b):
         """ Exponentiates two `Number` instances.
-            
             Parameters
             ----------
             a : Number
@@ -173,7 +172,6 @@ class Power(Operation):
     
     def partial_a(self):
         """ Returns d(a ** b)/da as int or float"""
-        # STUDENT CODE HERE
         return self.b.data * self.a.data**(self.b.data-1)
 
     def partial_b(self):
@@ -181,7 +179,6 @@ class Power(Operation):
             Reference: http://tutorial.math.lamar.edu/Classes/CalcI/DiffExpLogFcns.aspx
         """
         if self.a.data <= 0:
-            # raise ValueError(f"Cannot compute log({self.a.data})")
             return 0
         return math.log(self.a.data) * self.a.data ** self.b.data
 
@@ -246,8 +243,8 @@ class Number(object):
             Make it ans instance of `Number`, whose creator is f. Return this result."""
         ans = Number(f(a,b), creator=f)
         return ans
-        # Delete this raise-error statement once you have completed your implementation of `_op`
-
+    
+    #All the math functions. add is when it is on the lhs, radd is when the number is on the rhs
     def __add__(self, other):
         return self._op(Add, self, other)
 
@@ -281,6 +278,7 @@ class Number(object):
     def __neg__(self):
         return -1*self
     
+    #Comparators
     def __eq__(self, value):
         if isinstance(value, Number):
             value = value.data
