@@ -305,7 +305,6 @@ class Number(object):
         return self.data < value
         
     def backprop(self,grad=1, recursion=True):
-    
         if self.grad == None:
             self.grad = grad
         else:

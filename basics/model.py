@@ -4,18 +4,18 @@ from grad import *
 import time
 
 def weight_matrix(shape, naive=False):
-        """weight matrix thingy. Give the shape of weight matrix you want"""
-        number = 1
-        if(type(shape) == int):
-            shape = [shape]
-        for i in shape:
-            number*= i
-        if naive:
-            return np.array([Number(i / 10) for i in range(number)]).reshape(*shape)
-        #Uses xavier init if 2d
-        if len(shape) == 2:
-            return np.array([Number(np.random.uniform(low=-math.sqrt(shape[0] + shape[1]), high=math.sqrt(shape[0] + shape[1]), size=None)) for i in range(number)]).reshape(*shape)
-        return np.array([Number(np.random.uniform(low=-.2, high=.2, size=None)) for i in range(number)]).reshape(*shape)
+    """weight matrix thingy. Give the shape of weight matrix you want"""
+    number = 1
+    if(type(shape) == int):
+        shape = [shape]
+    for i in shape:
+        number*= i
+    if naive:
+        return np.array([Number(i / 10) for i in range(number)]).reshape(*shape)
+    #Uses xavier init if 2d
+    if len(shape) == 2:
+        return np.array([Number(np.random.uniform(low=-math.sqrt(1/shape[0] ), high=math.sqrt(1/shape[0]), size=None)) for i in range(number)]).reshape(*shape)
+    return np.array([Number(np.random.uniform(low=-.2, high=.2, size=None)) for i in range(number)]).reshape(*shape)
 
 #Activation fxns:
 def sigmoid(x):
@@ -107,7 +107,7 @@ def old_sort(N):
     
 class Model():
         
-    def __init__(self, input_size, output_size, hidden_layers, naive=False, seed=None):
+    def __init__(self, input_size, output_size, hidden_layers, naive=False, seed=None, debug=False):
         '''
         Takes list of # of things in their layers.
         Input_size and output_size are the number of input/output neurons
@@ -123,10 +123,12 @@ class Model():
         self.layer_sizes = hidden_layers
         self.layers = []
         self.biases = []
+        self.debug=False
 
         #Hidden states is after the *weight but before activation fxn. These are mainly for debugging.
-        self.hidden_states = []
-        self.hidden_states_activation = []
+        if self.debug:
+            self.hidden_states = []
+            self.hidden_states_activation = []
         
         prev_size = input_size
         
@@ -138,24 +140,29 @@ class Model():
         hidden_layers.append(input_size)
 
     def fd(self, x):
-        '''f pass with input. Input has to be flat like a pancake'''
-            
-        self.hidden_states_activation = []
-        self.hidden_states = []
+        '''f pass with input. '''
+        if self.debug:
+            self.hidden_states_activation = []
+            self.hidden_states = []
+
         self.input = x
         for i in range(len(self.layers)):
             x = x @ self.layers[i]
             x += self.biases[i]
-            self.hidden_states.append(x)
+
+            if self.debug:
+                self.hidden_states.append(x)
+
             if i != len(self.layers) - 1:
                 x = relu(x)
             else:
                 x = sigmoid(x) #Only sigmoid the last one.
-            self.hidden_states_activation.append(x)
+            if self.debug:
+                self.hidden_states_activation.append(x)
 
         return x
         
-    def train_epoch(self, x, y, lr=10**-2, timer=False):
+    def train_epoch(self, x, y, lr=10**-2, timer=False, batch_timer = True):
         '''
         f pass and then gradient descent.
         x: Input. Not flat as a pancake
@@ -164,29 +171,35 @@ class Model():
         '''
         if timer:
             start_time = time.perf_counter() 
-            full_start = time.perf_counter()
+        full_start = time.perf_counter()
+        print("starting training")
+
         num_correct = 0
         losses = []
         weight_sizes = []
+
         for i in range(len(y)):
             pred = self.fd(x[i])
+
+            batch_start_time = time.perf_counter()
             if timer:
                 print(f"Elapsed time for fd pass: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
-
+           
             y = np.array(y)
 
             for layer in self.layers:
                  for w in layer.flat:
                      w.null_gradients(recursive=False)
- 
             for bias in self.biases:
                  for b in bias.flat:
                      b.null_gradients(recursive=False)
+
             if timer:
                 print(f"Elapsed time for null gradients: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
-            
+
+            # print(pred.shape) #32, 10
             mse = np.sum(pred * pred - 2 * pred * y + y * y)/(len(pred) * len(y))
 
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
@@ -197,6 +210,8 @@ class Model():
                 start_time = time.perf_counter() 
             # print("mse", mse)
             mse_sorted = topo_sort(mse)
+            print(f"{len(mse_sorted)}")
+
             if timer:
                 print(f"Elapsed time for topo sorting mse gradients: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
@@ -223,12 +238,13 @@ class Model():
             if timer:
                 print(f"Elapsed time for gradient updates { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
- 
-        print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
+            if batch_timer:
+                print(f"Elapsed time for one batch: { time.perf_counter()  - batch_start_time} seconds")
+                start_time = time.perf_counter()
 
-        if timer:
-            print(f"Elapsed time for one batch: { time.perf_counter()  - start_time} seconds")
-            start_time = time.perf_counter() 
+        print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
+        print(f"Elapsed time for one epoch: { time.perf_counter()  - full_start} seconds")
+ 
         return losses
  
     def print_info(self, verbose=True):
