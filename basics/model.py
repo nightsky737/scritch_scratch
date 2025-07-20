@@ -201,16 +201,15 @@ class Model():
 
             # print(pred.shape) #32, 10
             mse = np.sum(pred * pred - 2 * pred * y + y * y)/(len(pred) * len(y))
-
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
-            losses.append(mse)
+            losses.append(mse.data)
 
             if timer:
                 print(f"Elapsed time for mse stuff: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
             # print("mse", mse)
             mse_sorted = topo_sort(mse)
-            print(f"{len(mse_sorted)}")
+            # print(f"{len(mse_sorted)}")
 
             if timer:
                 print(f"Elapsed time for topo sorting mse gradients: { time.perf_counter()  - start_time} seconds")
@@ -244,7 +243,7 @@ class Model():
 
         print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
         print(f"Elapsed time for one epoch: { time.perf_counter()  - full_start} seconds")
- 
+
         return losses
  
     def print_info(self, verbose=True):
