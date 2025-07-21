@@ -14,12 +14,18 @@ def weight_matrix(shape, naive=False):
         return np.array([Number(i / 10) for i in range(number)]).reshape(*shape)
     #Uses xavier init if 2d
     if len(shape) == 2:
-        return np.array([Number(np.random.uniform(low=-math.sqrt(1/shape[0] ), high=math.sqrt(1/shape[0]), size=None)) for i in range(number)]).reshape(*shape)
+        return np.array([Number(np.random.uniform(low=-math.sqrt(6/shape[0] ), high=math.sqrt(6/shape[0]), size=None)) for i in range(number)]).reshape(*shape)
     return np.array([Number(np.random.uniform(low=-.2, high=.2, size=None)) for i in range(number)]).reshape(*shape)
 
 #Activation fxns:
 def sigmoid(x):
     return np.vectorize(lambda x: 1/(1+math.e**-x))(x)
+
+
+def softmax(x):
+    # subtract max for numerical stability
+    e_x = np.vectorize(lambda x: math.e**x)(x)
+    return e_x / np.sum(e_x, axis=0, keepdims=True)
 
 def relu(x):
     def relu_one(k):
@@ -156,7 +162,8 @@ class Model():
             if i != len(self.layers) - 1:
                 x = relu(x)
             else:
-                x = sigmoid(x) #Only sigmoid the last one.
+                print(x)
+                x = softmax(x) #Only sigmoid the last one.
             if self.debug:
                 self.hidden_states_activation.append(x)
 
@@ -172,7 +179,6 @@ class Model():
         if timer:
             start_time = time.perf_counter() 
         full_start = time.perf_counter()
-        print("starting training")
 
         num_correct = 0
         losses = []
@@ -223,8 +229,8 @@ class Model():
                 print(f"Elapsed time for backprop: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
                 
-            # for i, layer in enumerate(self.layers):
-            #     print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
+            for i, layer in enumerate(self.layers):
+                print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
 
             for i, layer in enumerate(self.layers):
                 for w in range(len(layer.flat)):

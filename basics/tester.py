@@ -25,7 +25,12 @@ def fix_data(x, y):
 fixed_x, fixed_y = fix_data(x_train[:1000], y_train[:1000])
 b_x , b_y = batch(fixed_x, fixed_y, 32)
 
+test_bx = [b_x[0] for i in range(3)]
+test_by = [b_y[0] for i in range(3)] #Fun challenge: Can you overfit to this?
+
 my_model = Model(28*28, 10, [4, 8])
 datas = []
 for _epoch in range(10):
-    datas.append(my_model.train_epoch(b_x, b_y, lr=10e-1, timer=False, batch_timer=False))
+    print(f"starting epoch {_epoch}")
+    datas.append(my_model.train_epoch(test_bx, test_by, lr=1e-3, timer=False, batch_timer=False))
+
