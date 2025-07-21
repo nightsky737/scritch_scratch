@@ -22,23 +22,20 @@ def jax_weight_matrix(shape, naive=False):
 def jax_relu(x):
     return jnp.where(x <= 0, 1e-2 * x, x)
 
-#Note:sigmoid and mse can do weird things to the gradients but they can work okay on easy datasets (mnist)
 def jax_sigmoid(x):
     return jnp.vectorize(lambda x: 1/(1+jnp.e**-x))(x)
 
 def jax_mse(x, y):
     return jnp.sum(x * x - 2 * x * y + y * y)
 
-
 def jax_softmax(x):
-    sigmoided = 1 / (1 + jnp.exp(-x)) 
-    return x / jnp.expand_dims(jnp.sum(sigmoided, axis=1),axis=1 )
-     
+    exponentiated = jnp.exp(x - jnp.max(x, axis=-1, keepdims=True)) #Subtract the max in order to keep it from overflowing silently 
+    return exponentiated / jnp.sum(exponentiated, axis=-1, keepdims=True) #oh wow keepdims is possible.
+    
+from jax.nn import log_softmax
 
 def jax_cross_entropy(x, y):
-    eps = 1e-7 
-    x_clipped = jnp.clip(x, eps, 1 - eps) #Taking the log of 0 or big numbers is no good
-    return -1 * jnp.einsum("ab,ab->", y, jnp.log(x_clipped)) / len(y) #Einsum is basically doing batch wise dot product.
+    return -jnp.sum(y * jnp.log(x)) / len(y)
 
 class JaxModel():
     def __init__(self, input_size, output_size, hidden_layers, loss_fn=jax_mse, activation_fn=sigmoid, naive=False, seed=None):
@@ -52,6 +49,10 @@ class JaxModel():
         self.biases = []
         self.loss_fn = loss_fn
         self.activation_fn = activation_fn
+        self.eval_activation_fn = activation_fn
+
+        # if loss_fn == jax_cross_entropy:
+        #     self.activation_fn = None
 
         prev_size = input_size
         
@@ -76,7 +77,7 @@ class JaxModel():
             if i != len(self.layers) - 1:
                 x = jax_relu(x)
             else:
-                x = self.activation_fn(x)
+                x = self.eval_activation_fn(x)
             # self.hidden_states_activation.append(x)
         return x
         
@@ -88,13 +89,13 @@ class JaxModel():
             x += b[i]
             if i != len(b) - 1:
                 x = jax_relu(x)
-            else:
+            elif self.activation_fn is not None:
                 x = self.activation_fn(x)
         y = jnp.array(y)
         return self.loss_fn(x, y) #Now it just passes it to the loss fn. NO ifs cause jax doesnt like if
 
             
-    def train_epoch(self, x, y, lr=10**-2):
+    def train_epoch(self, x, y, lr=10**-2): 
         '''
         f pass and then uh gradient descent?
 
