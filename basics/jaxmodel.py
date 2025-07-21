@@ -32,7 +32,7 @@ def jax_softmax(x):
     exponentiated = jnp.exp(x - jnp.max(x, axis=-1, keepdims=True)) #Subtract the max in order to keep it from overflowing silently 
     return exponentiated / jnp.sum(exponentiated, axis=-1, keepdims=True) #oh wow keepdims is possible.
     
-from jax.nn import log_softmax
+from jax.nn import log_softmax #this also exists. I think logs are also more efficent cause theyre adding but im not doing it
 
 def jax_cross_entropy(x, y):
     return -jnp.sum(y * jnp.log(x)) / len(y)

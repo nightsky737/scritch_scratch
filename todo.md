@@ -7,4 +7,5 @@ Code to display img in autodiff check
 # Maybe:
 fix the topo sort (later)
 computational graph size be fluctuating. Why? who knows?
-#lmao we just do this on the last batch not even running acc or anything (in both models train loop not saving right metrics)
+#we just do this on the last batch not even running acc or anything (in both models train loop not saving right metrics)
+log softmax
