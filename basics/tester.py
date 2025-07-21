@@ -28,7 +28,7 @@ def fix_data(x, y):
 fixed_x, fixed_y = fix_data(x_train[:10000], y_train[:10000])
 b_x , b_y = batch(fixed_x, fixed_y, 32)
 
-my_model = JaxModel(28*28, 10, [ 8, 16], mse)
+my_model = JaxModel(28*28, 10, [ 8, 16], jax_cross_entropy, activation_fn=jax_softmax)
 datas = []
 for _epoch in range(20):
     print(f"starting epoch {_epoch}")

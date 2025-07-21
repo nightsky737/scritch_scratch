@@ -7,9 +7,6 @@ import math
 from grad import *
 from model import *
 
-def jax_sigmoid(x):
-    return jnp.vectorize(lambda x: 1/(1+math.e**-x))(x)
-
 def jax_weight_matrix(shape, naive=False):
     """weight matrix thingy.give dims. Not 0."""
     number = 1
@@ -25,24 +22,37 @@ def jax_weight_matrix(shape, naive=False):
 def jax_relu(x):
     return jnp.where(x <= 0, 1e-2 * x, x)
 
-def mse(x, y):
+#Note:sigmoid and mse can do weird things to the gradients but they can work okay on easy datasets (mnist)
+def jax_sigmoid(x):
+    return jnp.vectorize(lambda x: 1/(1+jnp.e**-x))(x)
+
+def jax_mse(x, y):
     return jnp.sum(x * x - 2 * x * y + y * y)
 
-def cross_entropy(x, y):
-    return 
+
+def jax_softmax(x):
+    sigmoided = 1 / (1 + jnp.exp(-x)) 
+    return x / jnp.expand_dims(jnp.sum(sigmoided, axis=1),axis=1 )
+     
+
+def jax_cross_entropy(x, y):
+    eps = 1e-7 
+    x_clipped = jnp.clip(x, eps, 1 - eps) #Taking the log of 0 or big numbers is no good
+    return -1 * jnp.einsum("ab,ab->", y, jnp.log(x_clipped)) / len(y) #Einsum is basically doing batch wise dot product.
 
 class JaxModel():
-    def __init__(self, input_size, output_size, hidden_layers, loss_fn=mse, naive=False, seed=None):
+    def __init__(self, input_size, output_size, hidden_layers, loss_fn=jax_mse, activation_fn=sigmoid, naive=False, seed=None):
         '''
         Honestly jax doesnt play great with class structures but thats fine.
         '''
         if seed != None:
             np.random.seed(seed)
-
         self.layer_sizes = hidden_layers
         self.layers = []
         self.biases = []
         self.loss_fn = loss_fn
+        self.activation_fn = activation_fn
+
         prev_size = input_size
         
         for hidden_layer in hidden_layers:
@@ -66,9 +76,8 @@ class JaxModel():
             if i != len(self.layers) - 1:
                 x = jax_relu(x)
             else:
-                x = jax_sigmoid(x)
+                x = self.activation_fn(x)
             # self.hidden_states_activation.append(x)
-
         return x
         
     def loss_static(self, params, x, y):
@@ -80,8 +89,7 @@ class JaxModel():
             if i != len(b) - 1:
                 x = jax_relu(x)
             else:
-                x = jax_sigmoid(x)
-
+                x = self.activation_fn(x)
         y = jnp.array(y)
         return self.loss_fn(x, y) #Now it just passes it to the loss fn. NO ifs cause jax doesnt like if
 
@@ -98,9 +106,9 @@ class JaxModel():
         x = np.array(x)
         
         for batch_num in range(len(y)):
-            mse, grads = jax.value_and_grad(self.loss_static, argnums=(0))((self.layers, self.biases), x[batch_num], y[batch_num])
+            loss, grads = jax.value_and_grad(self.loss_static, argnums=(0))((self.layers, self.biases), x[batch_num], y[batch_num])
             
-            losses.append(mse)
+            losses.append(loss)
             
             #0 contains weights and 1 contains the bias grads. 
             # print([i.shape for i in grads[1]])
@@ -115,10 +123,11 @@ class JaxModel():
                 
             for i, (bias, grad_bias) in enumerate(zip(self.biases, grads[1])):
                 self.biases[i] = bias - lr * grad_bias   
-                
+
+        #lmao we just do this on the last batch not even running acc or anything
         preds = self.fd(x[batch_num]) 
         
         correct = jnp.sum(jnp.argmax(preds, axis=1) == jnp.argmax(y[batch_num], axis=1))
         acc = correct / len(y[batch_num])
-        print(f"Acc: {acc} Loss: {mse}")
+        print(f"Acc: {acc} Loss: {loss}")
         return losses
