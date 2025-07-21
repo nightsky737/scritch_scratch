@@ -3,3 +3,5 @@ Adapt it into something that is more annotated/easier for someone else to unders
 i dont know what is going on w/ loss and acc but it aind pretty. Why is loss going UP?
 implement cross entropy on jax
 fix the topo sort (later)
+run the thing for a couple hours
+#Code to display img in autodiff check

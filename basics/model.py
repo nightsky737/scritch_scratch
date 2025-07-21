@@ -205,7 +205,7 @@ class Model():
                 start_time = time.perf_counter() 
 
             # print(pred.shape) #32, 10
-            mse = np.sum(pred * pred - 2 * pred * y + y * y) #/(len(pred) * len(y))
+            mse = np.sum(pred * pred - 2 * pred * y + y * y) /(len(pred))
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
             losses.append(mse.data)
 
