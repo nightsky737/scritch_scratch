@@ -1,6 +1,6 @@
 # Model notes
 Cross entropy loss could be used w/ softmax and sigmoid
-mse can work with softmax/sigmoid but typically not as well as cross entropy
+mse can work with softmax/sigmoid but typically not as well as cross entropy (as the squishing due to softmax can result in weirdness w/ squaring.)
 
 softmax and sigmoid are different. both use the exponents but in very different ways.
 
