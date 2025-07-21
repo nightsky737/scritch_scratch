@@ -13,8 +13,8 @@ def weight_matrix(shape, naive=False):
     if naive:
         return np.array([Number(i / 10) for i in range(number)]).reshape(*shape)
     #Uses xavier init if 2d
-    if len(shape) == 2:
-        return np.array([Number(np.random.uniform(low=-math.sqrt(6/shape[0] ), high=math.sqrt(6/shape[0]), size=None)) for i in range(number)]).reshape(*shape)
+    #if len(shape) == 2:
+    #    return np.array([Number(np.random.uniform(low=-math.sqrt(6/shape[0] ), high=math.sqrt(6/shape[0]), size=None)) for i in range(number)]).reshape(*shape)
     return np.array([Number(np.random.uniform(low=-.2, high=.2, size=None)) for i in range(number)]).reshape(*shape)
 
 #Activation fxns:
@@ -162,8 +162,7 @@ class Model():
             if i != len(self.layers) - 1:
                 x = relu(x)
             else:
-                print(x)
-                x = softmax(x) #Only sigmoid the last one.
+                x = sigmoid(x) #Only sigmoid the last one.
             if self.debug:
                 self.hidden_states_activation.append(x)
 

@@ -16,7 +16,7 @@ class Operation(object):
         """ Computes the forward pass of this operation: op(a, b) -> output"""
         raise NotImplementedError
 
-    def backprop(self, grad, recursion=True):
+    def backprop(self, grad, recursion=True, should_print=False):
         """ Calls .backprop for self.a and self.b, passing to it dF/da and
             dF/db, respectively, where F represents the terminal `Number`-instance node 
             in the computational graph, which originally invoked `F.backprop().
@@ -31,8 +31,8 @@ class Operation(object):
 
             recursion: Whether or not we should keep computing afterwards. 
             """
-        self.a.backprop(self.partial_a() * grad, recursion)  # backprop: dF/d(op)*d(op)/da -> dF/da
-        self.b.backprop(self.partial_b() * grad, recursion)
+        self.a.backprop(self.partial_a() * grad, recursion, should_print)  # backprop: dF/d(op)*d(op)/da -> dF/da
+        self.b.backprop(self.partial_b() * grad, recursion, should_print)
         
     def backprop_single(self, grad):
         self.a.backprop(self.partial_a() * grad, False)  # backprop: dF/d(op)*d(op)/da -> dF/da
@@ -304,13 +304,15 @@ class Number(object):
             value = value.data
         return self.data < value
         
-    def backprop(self,grad=1, recursion=True):
+    def backprop(self,grad=1, recursion=True, should_print=False):
+        if should_print:
+            print(f"backpropping {self.data}")
         if self.grad == None:
             self.grad = grad
         else:
             self.grad += grad
         if self.creator != None and recursion:
-            self.creator.backprop(grad) #chain rule orz.
+            self.creator.backprop(grad, should_print=should_print) #chain rule orz.
 
 
     def backprop_single(self):

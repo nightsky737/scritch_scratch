@@ -3,6 +3,8 @@ import keras
 from grad import *
 from model import *
 import numpy as np
+import jax.numpy as jnp
+import jax
 
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data(path="mnist.npz", )
 indices = np.arange(len(x_train))
@@ -27,6 +29,23 @@ b_x , b_y = batch(fixed_x, fixed_y, 32)
 
 test_bx = [b_x[0] for i in range(3)]
 test_by = [b_y[0] for i in range(3)] #Fun challenge: Can you overfit to this?
+
+
+# testmine = Number(2.)
+# mysigmoid = 1/(1+math.e**-testmine)
+
+# mysigmoid.backprop(should_print=True)
+# print(topo_sort(mysigmoid))
+
+# def jaxsigmoid(x):
+#     x = jnp.sum(x)
+#     return 1 / (1 + jnp.exp(-x)) 
+
+# testjax = jnp.array([2.]) 
+# sigmoided_value, grads = jax.value_and_grad(jaxsigmoid, argnums=(0))(testjax)
+
+# print(f"value comparison:", f"Mine {mysigmoid}", f"Jax {sigmoided_value}")
+# print(f"Grad comparison:", f"Mine {[testmine.grad]}", f"Jax{grads}")
 
 my_model = Model(28*28, 10, [4, 8])
 datas = []
