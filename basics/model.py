@@ -30,7 +30,7 @@ def softmax(x):
 def relu(x):
     def relu_one(k):
         if k <= 0:
-            return 10e-2 * k
+            return 1e-2 * k
         else:
             return k
     return np.vectorize(lambda x: relu_one(x))(x)
@@ -205,7 +205,7 @@ class Model():
                 start_time = time.perf_counter() 
 
             # print(pred.shape) #32, 10
-            mse = np.sum(pred * pred - 2 * pred * y + y * y)/(len(pred) * len(y))
+            mse = np.sum(pred * pred - 2 * pred * y + y * y) #/(len(pred) * len(y))
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
             losses.append(mse.data)
 
@@ -227,9 +227,9 @@ class Model():
             if timer:
                 print(f"Elapsed time for backprop: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
-                
-            for i, layer in enumerate(self.layers):
-                print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
+        
+            # for i, layer in enumerate(self.layers):
+            #     print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
 
             for i, layer in enumerate(self.layers):
                 for w in range(len(layer.flat)):

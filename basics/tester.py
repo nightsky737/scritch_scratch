@@ -24,32 +24,12 @@ def fix_data(x, y):
     test[np.arange(x.shape[0]),y] = 1
     return (x, test)
 
-fixed_x, fixed_y = fix_data(x_train[:1000], y_train[:1000])
-b_x , b_y = batch(fixed_x, fixed_y, 32)
+fixed_x, fixed_y = fix_data(x_train[:1], y_train[:1])
+b_x , b_y = batch(fixed_x, fixed_y, 1)
 
-test_bx = [b_x[0] for i in range(3)]
-test_by = [b_y[0] for i in range(3)] #Fun challenge: Can you overfit to this?
-
-
-# testmine = Number(2.)
-# mysigmoid = 1/(1+math.e**-testmine)
-
-# mysigmoid.backprop(should_print=True)
-# print(topo_sort(mysigmoid))
-
-# def jaxsigmoid(x):
-#     x = jnp.sum(x)
-#     return 1 / (1 + jnp.exp(-x)) 
-
-# testjax = jnp.array([2.]) 
-# sigmoided_value, grads = jax.value_and_grad(jaxsigmoid, argnums=(0))(testjax)
-
-# print(f"value comparison:", f"Mine {mysigmoid}", f"Jax {sigmoided_value}")
-# print(f"Grad comparison:", f"Mine {[testmine.grad]}", f"Jax{grads}")
-
-my_model = Model(28*28, 10, [4, 8])
+my_model = Model(28*28, 10, [ 8, 16])
 datas = []
-for _epoch in range(10):
+for _epoch in range(100):
     print(f"starting epoch {_epoch}")
-    datas.append(my_model.train_epoch(test_bx, test_by, lr=1e-3, timer=False, batch_timer=False))
+    datas.append(my_model.train_epoch(b_x, b_y, lr=1e-2, timer=False, batch_timer=False))
 
