@@ -25,12 +25,17 @@ def fix_data(x, y):
     test[np.arange(x.shape[0]),y] = 1
     return (x, test)
 
-fixed_x, fixed_y = fix_data(x_train[:10000], y_train[:10000])
+fixed_x, fixed_y = fix_data(x_train[:1000], y_train[:1000])
 b_x , b_y = batch(fixed_x, fixed_y, 32)
 
-my_model = JaxModel(28*28, 10, [ 8, 16], jax_cross_entropy, activation_fn=jax_softmax)
+# my_model = JaxModel(28*28, 10, [ 8, 16], jax_cross_entropy, activation_fn=jax_softmax)
+# datas = []
+# for _epoch in range(20):
+#     print(f"starting epoch {_epoch}")
+#     datas.append(my_model.train_epoch(b_x, b_y, lr=1e-2 ))
+
+my_model = Model(28*28, 10, [8, 16])
 datas = []
 for _epoch in range(20):
     print(f"starting epoch {_epoch}")
     datas.append(my_model.train_epoch(b_x, b_y, lr=1e-2 ))
-

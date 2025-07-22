@@ -22,10 +22,13 @@ def sigmoid(x):
     return np.vectorize(lambda x: 1/(1+math.e**-x))(x)
 
 
+def cross_entropy(x, y):
+    return -np.sum(y * np.log(x)) / len(y)
+
 def softmax(x):
     # subtract max for numerical stability
     e_x = np.vectorize(lambda x: math.e**x)(x)
-    return e_x / np.sum(e_x, axis=0, keepdims=True)
+    return e_x / np.sum(e_x, axis=-1, keepdims=True)
 
 def relu(x):
     def relu_one(k):
@@ -75,41 +78,6 @@ def topo_sort(N):
         
     return ret
 
-"""
-def old_sort(N):
-    '''Returns the correct order to backprop N in. This is such that if you call backprop(N), the gradient on N is final.
-    returns a list of Numbers.
-    
-    So ideally we'd just backprop one layer (to N's two creators (ie a and b when u backprop N in a * b = N) when we get to the N 
-
-    *sigh* back to the usaco grind
-    '''
-    ret = []
-    visited = {}
-    def dfs(number, debug=True):
-        # print(number)
-        '''
-        dfs's a Number, following it down the path by df'sing its two creators.
-        '''
-        if visited.get(number)== "visited":
-            return True
-        if visited.get(number) == "visiting":
-            return False
-            
-        visited[number] = "visiting"
-        if number.creator != None:
-            if not dfs(number.creator.a) and debug:
-                print("please pleas please do not ever print this")
-            if not dfs(number.creator.b) and debug:
-                print("please pleas please do not ever print this")
-        visited[number] = "visited"
-        ret.append(number)
-        return True
-        
-    dfs(N)
-    ret.reverse()
-    return ret
- """
     
 class Model():
         
@@ -168,7 +136,7 @@ class Model():
 
         return x
         
-    def train_epoch(self, x, y, lr=10**-2, timer=False, batch_timer = True):
+    def train_epoch(self, x, y, lr=10**-2, timer=False, batch_timer = False):
         '''
         f pass and then gradient descent.
         x: Input. Not flat as a pancake
@@ -205,15 +173,16 @@ class Model():
                 start_time = time.perf_counter() 
 
             # print(pred.shape) #32, 10
-            mse = np.sum(pred * pred - 2 * pred * y + y * y) /(len(pred))
+            loss = np.sum( (pred - y[i]) ** 2) /(len(pred))
+            # loss = cross_entropy(pred, y[i])
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
-            losses.append(mse.data)
+            losses.append(loss.data)
 
             if timer:
                 print(f"Elapsed time for mse stuff: { time.perf_counter()  - start_time} seconds")
                 start_time = time.perf_counter() 
             # print("mse", mse)
-            mse_sorted = topo_sort(mse)
+            mse_sorted = topo_sort(loss)
             # print(f"{len(mse_sorted)}")
 
             if timer:
@@ -229,7 +198,7 @@ class Model():
                 start_time = time.perf_counter() 
         
             # for i, layer in enumerate(self.layers):
-            #     print(f"Layer {i} avg grad:", np.mean([w.grad for w in layer.flat]))
+            #     print(f"Layer {i} avg grad magnitude:", np.mean([abs(w.grad) for w in layer.flat]))
 
             for i, layer in enumerate(self.layers):
                 for w in range(len(layer.flat)):
