@@ -94,7 +94,7 @@ class JaxModel():
         return self.loss_fn(x, y) #Now it just passes it to the loss fn. NO ifs cause jax doesnt like if
 
             
-    def train_epoch(self, x, y, lr=10**-2): 
+    def train_epoch(self, x, y, test_data, lr=10**-2): 
         '''
         f pass and then uh gradient descent?
 
@@ -125,9 +125,10 @@ class JaxModel():
                 self.biases[i] = bias - lr * grad_bias   
 
         #lmao we just do this on the last batch not even running acc or anything
-        preds = self.fd(x[batch_num]) 
+        testX, testY = test_data
+        preds = self.fd(testX[0]) 
         
-        correct = jnp.sum(jnp.argmax(preds, axis=1) == jnp.argmax(y[batch_num], axis=1))
-        acc = correct / len(y[batch_num])
+        correct = jnp.sum(jnp.argmax(preds, axis=1) == jnp.argmax(testY[0], axis=1))
+        acc = correct / len(testY[0])
         print(f"Acc: {acc} Loss: {loss}")
         return losses
