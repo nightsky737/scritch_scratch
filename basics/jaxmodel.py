@@ -80,7 +80,7 @@ class JaxModel():
                 x = self.eval_activation_fn(x)
             # self.hidden_states_activation.append(x)
         return x
-        
+
     def loss_static(self, params, x, y):
         '''f pass with for loss.  '''
         w, b = params

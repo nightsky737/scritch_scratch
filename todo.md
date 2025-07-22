@@ -4,6 +4,7 @@ implement cross entropy on jax
 run the thing for a couple hours
 Code to display img in autodiff check
 Make notebooks less janky and possible to use by someone not me. b
+add metric tracking to models.
 
 # Maybe:
 fix the topo sort (later)
