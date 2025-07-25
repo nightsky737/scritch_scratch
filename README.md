@@ -21,7 +21,7 @@ CNN folder has CNN stuff
 
 You can also look at the code I wrote for the models, which are in the \[modelname\].py files. That code might be a bit messy and not super readable, though.
 
-3. Further instructions/documentation might come up as you run the code in the notebooks.
+Further instructions/documentation might come up as you run the code in the notebooks.
 
 # Screenshots:
 1. From overfitting to an image
