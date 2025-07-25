@@ -25,6 +25,9 @@ You can also look at the code I wrote for the models, which are in the \[modelna
 Further instructions/documentation might come up as you run the code in the notebooks.
 
 # Screenshots:
+
+These show the model's prediction of what a handwritten number is. (mnist dataset)
+
 1. From overfitting to an image
 ![alt text](image-1.png)
 2. From the feed forward neural network
