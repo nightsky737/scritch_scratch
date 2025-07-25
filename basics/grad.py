@@ -279,10 +279,10 @@ class Number(object):
         return -1*self
     
     #Comparators
-    def __eq__(self, value):
-        if isinstance(value, Number):
-            value = value.data
-        return self.data == value
+    # def __eq__(self, value):
+    #     if isinstance(value, Number):
+    #         value = value.data
+    #     return self.data == value
     
     def __ge__(self, value):
         if isinstance(value, Number):

@@ -70,7 +70,6 @@ class JaxModel():
 
     def fd(self, x):
         '''f pass with input. '''
-
         for i in range(len(self.layers)):
             x = x @ self.layers[i]
             x += self.biases[i]
@@ -78,8 +77,8 @@ class JaxModel():
                 x = jax_relu(x)
             else:
                 x = self.eval_activation_fn(x)
-            # self.hidden_states_activation.append(x)
         return x
+    
     def loss_static(self, params, x, y):
         '''f pass with for loss.  '''
         w, b = params
@@ -127,7 +126,7 @@ class JaxModel():
         #lmao we just do this on the last batch not even running acc or anything
         testX, testY = test_data
         preds = self.fd(testX[0]) 
-        
+        print(preds)
         correct = jnp.sum(jnp.argmax(preds, axis=1) == jnp.argmax(testY[0], axis=1))
         acc = correct / len(testY[0])
         print(f"Acc: {acc} Loss: {loss}")

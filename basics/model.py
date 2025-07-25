@@ -173,7 +173,7 @@ class Model():
                 start_time = time.perf_counter() 
 
             # print(pred.shape) #32, 10
-            loss = np.sum( (pred - y[i]) ** 2) /(len(pred))
+            loss = np.sum( (pred - y[i]) ** 2) * 100
             # loss = cross_entropy(pred, y[i])
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
             losses.append(loss.data)
@@ -214,7 +214,6 @@ class Model():
             if batch_timer:
                 print(f"Elapsed time for one batch: { time.perf_counter()  - batch_start_time} seconds")
                 start_time = time.perf_counter()
-
         print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
         print(f"Elapsed time for one epoch: { time.perf_counter()  - full_start} seconds")
 
