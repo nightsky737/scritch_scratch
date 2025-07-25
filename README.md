@@ -11,7 +11,7 @@ I also do use a couple outside libraries (keras, sklearn) but I try not to use t
 
 Basics folder holds the model basics (ie the autodiff library and a simple feed forward neural net).
 - autodiff_check.ipynb
-        - I created my own autodiff library. [https://en.wikipedia.org/wiki/Automatic_differentiation](what is automatic differentiation)
+        - I created my own autodiff library. [https://en.wikipedia.org/wiki/Automatic_differentiation] (what is automatic differentiation)
         - I also test the custom autodiff library, performing backpropogation (checked /w jax, which is a python backpropogation library) and use gradient descent to overfit to an image
 - jaxmodel.ipynb
         - due to the autodiff library having been written by a teenager with very little experience, it's not very efficient. Here, I switch over to using Jax's autodiff library, but still create all the matrices, loss functions, weight updates myself.
