@@ -22,6 +22,14 @@ You can also look at the code I wrote for the models, which are in the \[modelna
 
 3. Further instructions/documentation might come up as you run the code in the notebooks.
 
+# Screenshots:
+1. From overfitting to an image
+![alt text](image-1.png)
+2. From the feed forward neural network
+![alt text](image.png) 
+3. From the convolutional neural network
+![alt text](image-2.png)
+
 # My notes:
 Neural nets and models have always just been a black box to me, and well, it's still a black box but it's now RGB(1, 1, 1) instead of RGB(0, 0, 0)
 
