@@ -76,7 +76,7 @@ def loss_static(weights, x, y):
     y = jnp.array(y)
     return optax.softmax_cross_entropy(x, y).mean() #softmax_ce takes logits as the arg.
 
-# @jax.jit
+@jax.jit
 def fd(weights, x):
     k, b, ffnn = weights
     for i in range(len(k)):

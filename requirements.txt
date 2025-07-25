@@ -1,9 +1,7 @@
 matplotlib
 tensorflow
-keras
-pytorch
 jax
 optax
-PIL
+Pillow
 scikit-learn
-keras
+numpy
