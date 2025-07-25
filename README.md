@@ -10,16 +10,17 @@ I also do use a couple outside libraries (keras, sklearn) but I try not to use t
 3. Inside will be a couple folders. 
 
 Basics folder holds the model basics (ie the autodiff library and a simple feed forward neural net).
-    - autodiff_check.ipynb
-        - This tests the custom autodiff library, performing backprop (checked /w jax) and gradient descent to overfit to an image
-    - jaxmodel.ipynb
-        - due to the autodiff library having been written by a teenager with very little experience, it's not very efficient. Here, I switch over to using Jax's autodiff library, but still create all the matrices and matmul them and calculate the loss fns myself
+- autodiff_check.ipynb
+        - I created my own autodiff library. [https://en.wikipedia.org/wiki/Automatic_differentiation](what is automatic differentiation)
+        - I also test the custom autodiff library, performing backpropogation (checked /w jax, which is a python backpropogation library) and use gradient descent to overfit to an image
+- jaxmodel.ipynb
+        - due to the autodiff library having been written by a teenager with very little experience, it's not very efficient. Here, I switch over to using Jax's autodiff library, but still create all the matrices, loss functions, weight updates myself.
 
-CNN folder has CNN stuff
-    - CNN.ipynb
-        - Uses jax to create CNN function. I do the kernel convolution, matrices, feed forward neural net myself, and use jax for the autodiff (Why not use mine? Because mine is slow)
+CNN folder has Convolutional Neural Network stuff
+- CNN.ipynb
+        - Uses jax to create a conolutional neural network. I implement the kernel's convolution, matrices, feed forward neural net myself, and use jax for the autodiff part.
 
-You can also look at the code I wrote for the models, which are in the \[modelname\].py files. That code might be a bit messy and not super readable, though.
+You can also look at the code I wrote for the models, which are in the \[modelname\].py files. 
 
 Further instructions/documentation might come up as you run the code in the notebooks.
 
@@ -35,9 +36,6 @@ Further instructions/documentation might come up as you run the code in the note
 Neural nets and models have always just been a black box to me, and well, it's still a black box but it's now RGB(1, 1, 1) instead of RGB(0, 0, 0)
 
 I also did part of this project prior to shipwrecked, having written most of the base backprop from scratch library as part of another program, and then extending it with the creation of the model based on my backprop and a jax model from nearish scratch for reference and learning more about the loss and activations fxns. I was about halfway through that when shipwrecked started, and thus have logged 15 more hours finishing the jax and homemade ffnn and the homemade cnn.
-
-For future me: 
-It's always the dumb stuff like proper ffnn initialization that makes things blow up/not learn. It was honeslty amazing how the acc jumped after I fixed the ffnn in the cnn at the end. THere are like so many moving brain exploding parts in these things that its kinda impressive how people can make llms when this is already so hard.
 
 # Other notes:
 There isn't much actual data pipelining (ie val, shuffle, data cleaning, etc, this is more just focused on the model itself.)
