@@ -4,3 +4,6 @@ keras
 pytorch
 jax
 optax
+PIL
+scikit-learn
+keras

@@ -173,7 +173,7 @@ class Model():
                 start_time = time.perf_counter() 
 
             # print(pred.shape) #32, 10
-            loss = np.sum( (pred - y[i]) ** 2) * 100
+            loss = np.sum( (pred - y[i]) ** 2) 
             # loss = cross_entropy(pred, y[i])
             num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
             losses.append(loss.data)

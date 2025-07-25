@@ -1,11 +1,26 @@
 # READ THIS
 This is honestly pretty useless to anyone except me. This was a project I've created to just understand deep learning better, and while there are features that work, I didn't prioritize making them accessible via a neat api or website. That being said, there are still a few runnable notebooks
 
+I also do use a couple outside libraries (keras, sklearn) but I try not to use them as much as I can.
+
 # Instructions for use
 
 1. Clone the repo.
-2. Inside will be a couple folders. Basics holds the model basics (ie the autodiff library and a simple ffnn). There are 2 versions implemented there, one from scratch and one using Jax. Their demo code are in, respectively, autodiff_check.ipnyb, and jaxmodel.ipynb.
-3. Further instructions might come up as you run the code in the notebooks.
+2. Inside will be a couple folders. 
+
+Basics folder holds the model basics (ie the autodiff library and a simple feed forward neural net).
+    - autodiff_check.ipynb
+        - This tests the custom autodiff library, performing backprop (checked /w jax) and gradient descent to overfit to an image
+    - jaxmodel.ipynb
+        - due to the autodiff library having been written by a teenager with very little experience, it's not very efficient. Here, I switch over to using Jax's autodiff library, but still create all the matrices and matmul them and calculate the loss fns myself
+
+CNN folder has CNN stuff
+    - CNN.ipynb
+        - Uses jax to create CNN function. I do the kernel convolution, matrices, feed forward neural net myself, and use jax for the autodiff (Why not use mine? Because mine is slow)
+
+You can also look at the code I wrote for the models, which are in the \[modelname\].py files. That code might be a bit messy and not super readable, though.
+
+3. Further instructions/documentation might come up as you run the code in the notebooks.
 
 # My notes:
 Neural nets and models have always just been a black box to me, and well, it's still a black box but it's now RGB(1, 1, 1) instead of RGB(0, 0, 0)

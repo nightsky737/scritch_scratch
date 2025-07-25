@@ -123,11 +123,13 @@ class JaxModel():
             for i, (bias, grad_bias) in enumerate(zip(self.biases, grads[1])):
                 self.biases[i] = bias - lr * grad_bias   
 
-        #lmao we just do this on the last batch not even running acc or anything
+        #lmao we just do this on the last of test data not even running acc or anything
         testX, testY = test_data
         preds = self.fd(testX[0]) 
-        print(preds)
+        # print(preds)
         correct = jnp.sum(jnp.argmax(preds, axis=1) == jnp.argmax(testY[0], axis=1))
         acc = correct / len(testY[0])
-        print(f"Acc: {acc} Loss: {loss}")
+        
+        avg_loss = jnp.mean(jnp.array(losses))
+        print(f"Acc: {acc:.4f} Loss: {avg_loss:.4f}")
         return losses

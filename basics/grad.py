@@ -180,6 +180,7 @@ class Power(Operation):
         """
         if self.a.data <= 0:
             return 0
+        
         return math.log(self.a.data) * self.a.data ** self.b.data
 
 
