@@ -6,7 +6,8 @@ I also do use a couple outside libraries (keras, sklearn) but I try not to use t
 # Instructions for use
 
 1. Clone the repo.
-2. Inside will be a couple folders. 
+2. Run pip install -r requirements.txt
+3. Inside will be a couple folders. 
 
 Basics folder holds the model basics (ie the autodiff library and a simple feed forward neural net).
     - autodiff_check.ipynb
