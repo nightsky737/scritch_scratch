@@ -78,9 +78,8 @@ if st.button("Click to start training the model. (this can take a few mins)"):
     for _epoch in range(num_epochs):
         losses, data = st.session_state.jaxmodel.train_epoch(b_x, b_y,  (x_test, y_test), lr=lr)
         acc, avg_loss = data
-        datas.append(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
-        st.write(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
-    
+        datas.append(f"Epoch: {_epoch} Acc: {acc * 100:.4f}% Loss: {avg_loss:.4f}")
+        st.write(f"Epoch: {_epoch} Acc: {acc * 100:.4f}% Loss: {avg_loss:.4f}") 
     session_state['jaxdata'] = datas
 
 # if "jaxdata" in session_state:

@@ -76,13 +76,13 @@ if st.button("Click to start training the model. (this can take 5-15 mins to run
         for _epoch in range(num_epochs):
             losses, data = st.session_state.convmodel.train_epoch(b_x_cnn, b_y,  (x_test_cnn, y_test), lr=lr)
             acc, avg_loss = data
-            datas.append(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
-            st.write(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
+            datas.append(f"Epoch: {_epoch} Acc: {acc * 100:.2f}% Loss: {avg_loss:.4f}")
+            st.write(f"Epoch: {_epoch} Acc: {acc * 100:.2f}% Loss: {avg_loss:.4f}") 
 
 if st.button("Click to show some of the model's predictions!"):
     fig = plt.figure(figsize=(10, 7))
     pic = 1
-    for i, img in enumerate(x_test[2][:10]):
+    for i, img in enumerate(x_test_cnn[2][:10]):
         plt.subplot(2, 5, pic)
         plt.axis('off')
         predicted = session_state.convmodel.fd(jnp.expand_dims(img, 0))
