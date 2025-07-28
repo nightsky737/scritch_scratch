@@ -4,8 +4,6 @@ from jax import grad
 import jax
 import numpy as np
 import math
-from grad import *
-from model import *
 
 def jax_weight_matrix(shape, naive=False):
     """weight matrix thingy.give dims. Not 0."""
@@ -36,7 +34,7 @@ def jax_cross_entropy(x, y):
     return -jnp.sum(y * jnp.log(x)) / len(y)
 
 class JaxModel():
-    def __init__(self, input_size, output_size, hidden_layers, loss_fn=jax_mse, activation_fn=sigmoid, naive=False, seed=None):
+    def __init__(self, input_size, output_size, hidden_layers, loss_fn=jax_mse, activation_fn=jax_sigmoid, naive=False, seed=None):
         '''
         Honestly jax doesnt play great with class structures but thats fine.
         '''

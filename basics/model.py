@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from grad import *
+from .grad import Operation, Number
 import time
 
 def weight_matrix(shape, naive=False):

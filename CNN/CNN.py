@@ -88,7 +88,7 @@ def fd(weights, x):
     x = x @ ffnn #logitssss again
     return x 
 
-class Model():
+class ConvModel():
     def __init__(self, params, naive=False, seed=0):
         '''
         Takes list of # of things in their layers.
