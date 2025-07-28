@@ -9,8 +9,7 @@ Gonna do a demo w/ streamlit
 
 import streamlit as st
 # from basics.model import *
-from basics.jaxmodel import *
-from CNN.CNN import *
+from ..basics.jaxmodel import *
 import numpy as np
 import keras
 import matplotlib.pyplot as plt
