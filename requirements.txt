@@ -1,6 +1,7 @@
+streamlit
 matplotlib
 tensorflow
-jax
+jax[cpu]
 optax
 Pillow
 scikit-learn
