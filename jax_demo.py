@@ -8,7 +8,7 @@ Gonna do a demo w/ streamlit
 '''
 
 import streamlit as st
-from basics.model import *
+# from basics.model import *
 from basics.jaxmodel import *
 from CNN.CNN import *
 import numpy as np
@@ -52,11 +52,10 @@ kernel_sizes = [5, 3,3]
 kernel_filters = [4, 8, 8]
 params = {"kernel_info" : list(zip(kernel_sizes, kernel_filters)), "input_shape": (28, 28, 1), "output_size": 10}
 st.session_state.convmodel = ConvModel(params)
-# st.session_state.jaxmodel = JaxModel(28*28, 10, [ 8, 16], jax_cross_entropy, jax_softmax) 
 
 
 st.write('Welcome to the very minimal but functional demo of the feed forward model!')
-st.write("first, set some hyperparameters. A known working combination that gets relatively quick results is lr=.1, softmax, and cross entropy for 5 epochs")
+st.write("first, set some hyperparameters. A known working combination that gets relatively quick results is lr=.1, softmax, and cross entropy for 5-7 epochs")
 lr= st.number_input("Learning rate")
 activation_fn=st.selectbox("Activation Function", options=["softmax", "sigmoid"])
 loss_fn=st.selectbox("Loss Function", options=["mse", "cross entropy"])
@@ -73,16 +72,14 @@ else:
     loss_fn = jax_cross_entropy
 
 if st.button("Click to start training the model. (this can take a few mins)"):
-    if 'total' not in st.session_state:
-        st.session_state.total=0 # or st.session_state['total'] = 0 -> kind of like uh the flask memory thing.
     st.session_state.jaxmodel = JaxModel(28*28, 10, [ 8, 16], loss_fn, activation_fn) 
 
     datas = []
     for _epoch in range(num_epochs):
         losses, data = st.session_state.jaxmodel.train_epoch(b_x, b_y,  (x_test, y_test), lr=lr)
         acc, avg_loss = data
-        datas.append(f"Epoch: {_epoch} Acc: {acc:.4f} Loss: {avg_loss:.4f}") 
-        st.write(f"Epoch: {_epoch} Acc: {acc:.4f} Loss: {avg_loss:.4f}") 
+        datas.append(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
+        st.write(f"Epoch: {_epoch} Acc: {acc:.4f * 100}% Loss: {avg_loss:.4f}") 
     
     session_state['jaxdata'] = datas
 
@@ -90,14 +87,14 @@ if st.button("Click to start training the model. (this can take a few mins)"):
 #     for log in session_state["jaxdata"]:
 #         st.write(log)
 
-if st.button("Click to show results!"):
+if st.button("Click to show some of the model's predictions!"):
     fig = plt.figure(figsize=(10, 7))
     pic = 1
     for i, img in enumerate(x_test[0][:10]):
         plt.subplot(2, 5, pic)
         plt.axis('off')
         predicted = st.session_state.jaxmodel.fd(jnp.array(img.flat))
-        plt.title(f"Truth {np.argmax(y_test[0][i])} mine {jnp.argmax(predicted)}")
+        plt.title(f"Truth:{np.argmax(y_test[0][i])} Predicted:{jnp.argmax(predicted)}")
         plt.imshow(img.reshape(28, 28))
         pic+= 1
         plt.show()
