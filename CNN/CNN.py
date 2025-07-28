@@ -172,5 +172,5 @@ class ConvModel():
         # acc = running_correct / (len(y[0]) * len(y))
         avg_loss = jnp.mean(jnp.array(losses))
         print(f"Acc: {acc:.4f} Loss: {avg_loss:.4f}")
-        return losses
+        return losses, (acc, avg_loss)
         return losses

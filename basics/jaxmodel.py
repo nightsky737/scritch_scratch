@@ -24,7 +24,7 @@ def jax_sigmoid(x):
     return jnp.vectorize(lambda x: 1/(1+jnp.e**-x))(x)
 
 def jax_mse(x, y):
-    return jnp.sum(x * x - 2 * x * y + y * y)
+    return jnp.sum(x * x - 2 * x * y + y * y)/len(x) #, axis=1 if u wanna mean it 
 
 def jax_softmax(x):
     exponentiated = jnp.exp(x - jnp.max(x, axis=-1, keepdims=True)) #Subtract the max in order to keep it from overflowing silently 
@@ -128,4 +128,4 @@ class JaxModel():
         
         avg_loss = jnp.mean(jnp.array(losses))
         print(f"Acc: {acc:.4f} Loss: {avg_loss:.4f}")
-        return losses
+        return losses, (acc, avg_loss)

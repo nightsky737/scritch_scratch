@@ -13,6 +13,7 @@ from basics.jaxmodel import *
 from CNN.CNN import *
 import numpy as np
 import keras
+import matplotlib.pyplot as plt
 
 
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data(path="mnist.npz", )
@@ -44,19 +45,60 @@ x_test_cnn = x_test.reshape(x_test.shape[0],  x_test.shape[1], 28, 28, 1)
 b_x_flat = b_x.reshape(b_x.shape[0], b_x.shape[1], 28*28)
 x_test_flat = x_test.reshape(x_test.shape[0], x_test.shape[1], 28*28)
 
-jaxmodel = JaxModel(28*28, 10, [ 8, 16], jax_mse, jax_sigmoid) 
+
+session_state = st.session_state
+
+kernel_sizes = [5, 3,3]
+kernel_filters = [4, 8, 8]
+params = {"kernel_info" : list(zip(kernel_sizes, kernel_filters)), "input_shape": (28, 28, 1), "output_size": 10}
+st.session_state.convmodel = ConvModel(params)
+# st.session_state.jaxmodel = JaxModel(28*28, 10, [ 8, 16], jax_cross_entropy, jax_softmax) 
 
 
-st.write('Hello')
-if st.button('click me'):
+st.write('Welcome to the very minimal but functional demo of the feed forward model!')
+st.write("first, set some hyperparameters. A known working combination that gets relatively quick results is lr=.1, softmax, and cross entropy for 5 epochs")
+lr= st.number_input("Learning rate")
+activation_fn=st.selectbox("Activation Function", options=["softmax", "sigmoid"])
+loss_fn=st.selectbox("Loss Function", options=["mse", "cross entropy"])
+num_epochs = st.number_input("num epochs to train", step=1)
+
+if activation_fn == "softmax":
+    activation_fn = jax_softmax
+else:
+    activation_fn = jax_sigmoid
+
+if loss_fn == "mse":
+    loss_fn = jax_mse
+else:
+    loss_fn = jax_cross_entropy
+
+if st.button("Click to start training the model. (this can take a few mins)"):
     if 'total' not in st.session_state:
         st.session_state.total=0 # or st.session_state['total'] = 0 -> kind of like uh the flask memory thing.
-    st.session_state.total += 1
-    st.write(st.session_state.total)
-    datas = []
+    st.session_state.jaxmodel = JaxModel(28*28, 10, [ 8, 16], loss_fn, activation_fn) 
 
-    for _epoch in range(20):
-        st.write(f"starting epoch {_epoch}")
-        st.write(jaxmodel.train_epoch(b_x, b_y,  (x_test, y_test), lr=1e-2 ))
-        
+    datas = []
+    for _epoch in range(num_epochs):
+        losses, data = st.session_state.jaxmodel.train_epoch(b_x, b_y,  (x_test, y_test), lr=lr)
+        acc, avg_loss = data
+        datas.append(f"Epoch: {_epoch} Acc: {acc:.4f} Loss: {avg_loss:.4f}") 
+        st.write(f"Epoch: {_epoch} Acc: {acc:.4f} Loss: {avg_loss:.4f}") 
     
+    session_state['jaxdata'] = datas
+
+# if "jaxdata" in session_state:
+#     for log in session_state["jaxdata"]:
+#         st.write(log)
+
+if st.button("Click to show results!"):
+    fig = plt.figure(figsize=(10, 7))
+    pic = 1
+    for i, img in enumerate(x_test[0][:10]):
+        plt.subplot(2, 5, pic)
+        plt.axis('off')
+        predicted = st.session_state.jaxmodel.fd(jnp.array(img.flat))
+        plt.title(f"Truth {np.argmax(y_test[0][i])} mine {jnp.argmax(predicted)}")
+        plt.imshow(img.reshape(28, 28))
+        pic+= 1
+        plt.show()
+    st.pyplot(fig)
