@@ -68,10 +68,11 @@ except:
     st.write("invalid input for filter sizes")
 params = {"kernel_info" : list(zip(kernel_sizes, kernel_filters)), "input_shape": (28, 28, 1), "output_size": 10}
 
-if st.button("Click to start training the model. (this can take 5-15 mins to run)"):
+if st.button("Click to start training the model. (this can take 10-15 mins to run)"):
     if len(kernel_sizes) != len(kernel_filters):
         st.write("The number of kernel sizes should be the same as the number of filters per kernel")
     else:
+        st.write("Starting Training!")
         st.session_state.convmodel = ConvModel(params)
         datas = []
         for _epoch in range(num_epochs):
@@ -80,7 +81,7 @@ if st.button("Click to start training the model. (this can take 5-15 mins to run
             datas.append(f"Epoch: {_epoch} Acc: {acc * 100:.2f}% Loss: {avg_loss:.4f}")
             st.write(f"Epoch: {_epoch} Acc: {acc * 100:.2f}% Loss: {avg_loss:.4f}") 
 
-if st.button("Click to show some of the model's predictions!"):
+if st.button("Click to show some of the model's predictions (this can also take a minute or two)!"):
     fig = plt.figure(figsize=(10, 7))
     pic = 1
     for i, img in enumerate(x_test_cnn[2][:10]):
@@ -91,3 +92,4 @@ if st.button("Click to show some of the model's predictions!"):
         plt.imshow(img.reshape(28, 28))
         pic+= 1
         plt.show()
+    st.pyplot(fig)
