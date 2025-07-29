@@ -31,29 +31,37 @@ def sigmoid(x):
 def relu(x):
     return jnp.where(x <= 0, 1e-2 * x, x)
 
-def convolve(x, filters):
-    '''
-    Filters in shape: (k_size, k_size,  c_in, c_outs)
-    x is input in BHWC
-    '''
+# def convolve(x, filters):
+#     '''
+#     Filters in shape: (k_size, k_size,  c_in, c_outs)
+#     x is input in BHWC
+#     '''
     
-    offset = filters.shape[1]//2 
-    # print(filters.shape)
-    # print(x.shape)
-    #Get the shape of the returned thing.
-    ret_b, ret_h, ret_w, ret_f = (x.shape[0], x.shape[1] - 2 * offset, x.shape[2] - 2 * offset, filters.shape[3])
-    ret = jnp.zeros((ret_b, ret_h, ret_w, ret_f))
+#     offset = filters.shape[1]//2 
+#     # print(filters.shape)
+#     # print(x.shape)
+#     #Get the shape of the returned thing.
+#     ret_b, ret_h, ret_w, ret_f = (x.shape[0], x.shape[1] - 2 * offset, x.shape[2] - 2 * offset, filters.shape[3])
+#     ret = jnp.zeros((ret_b, ret_h, ret_w, ret_f))
     
 
-    for i in range(offset,ret_h):
-        for j in range(offset, ret_w):
-            area = x[:,i - offset:i+offset + 1, j - offset: j + offset + 1,:]
-            to_set = jnp.einsum("bhwc,hwcf->bf", area, filters) #here h and w are the sizes of the conv kernel not the actual img
-            ret = ret.at[:,i-offset,j-offset,:].set(to_set)
+#     for i in range(offset,ret_h):
+#         for j in range(offset, ret_w):
+#             area = x[:,i - offset:i+offset + 1, j - offset: j + offset + 1,:]
+#             to_set = jnp.einsum("bhwc,hwcf->bf", area, filters) #here h and w are the sizes of the conv kernel not the actual img
+#             ret = ret.at[:,i-offset,j-offset,:].set(to_set)
 
-    return ret
+#     return ret
 
- 
+def convolve(x, kernel):
+    return jax.lax.conv_general_dilated(
+        x, kernel, window_strides=[1, 1],
+        dimension_numbers=('NHWC', 'HWIO', "NHWC"), #lhs, rhs, out -> im assuming this is input, filter format, out format
+        #in n batches, h x w images of c channels.
+        #my filters are uh hxhxin cxout c
+        padding="VALID"
+    )
+
 @jax.jit 
 def loss_static(weights, x, y):
     '''f pass with for loss.  Weights is tuple of [kernels, bias, ffnn]'''
