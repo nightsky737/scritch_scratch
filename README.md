@@ -5,6 +5,7 @@ I also do use a couple outside libraries (keras, sklearn) but I try not to use t
 
 # Demo links
 [Autodiff and feed forward demo](http://37.27.51.34:39567/)
+
 [CNN demo](http://37.27.51.34:41877/) 
 As a side note, the CNN can be quite slow (~15 mins to train), so please be patient. I've also run the CNN code and have outputs saved in the jupyter notebook CNN/CNN.ipynb.
 
