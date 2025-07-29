@@ -1,5 +1,5 @@
 # READ THIS
-This is honestly pretty useless to anyone except me. This was a project I've created to just understand deep learning better, and while there are features that work, I didn't prioritize making them accessible via a neat api or website. That being said, there are still a few runnable notebooks
+This is honestly pretty useless to anyone except me. This was a project I've created to just understand deep learning better, and while there are features that work, I didn't prioritize making them accessible via a neat api or website. That being said, there are still a few runnable notebooks and a demo link
 
 I also do use a couple outside libraries (keras, sklearn) but I try not to use them as much as I can.
 
