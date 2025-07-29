@@ -9,11 +9,12 @@ Gonna do a demo w/ streamlit
 
 import streamlit as st
 # from basics.model import *
-from ..basics.jaxmodel import *
+from basics.jaxmodel import *
+from basics.model import *
 import numpy as np
 import keras
 import matplotlib.pyplot as plt
-
+import random
 
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data(path="mnist.npz", )
 
@@ -38,22 +39,50 @@ fixed_x, fixed_y = fix_data(x_train, y_train)
 x_test, y_test = batch(*fix_data(x_test[:1000], y_test[:1000]), 32)
 b_x , b_y = batch(fixed_x[:10000], fixed_y[:10000], 64)
 
-b_x_cnn = b_x.reshape(b_x.shape[0], b_x.shape[1], 28, 28, 1)
-x_test_cnn = x_test.reshape(x_test.shape[0],  x_test.shape[1], 28, 28, 1)
-
 b_x_flat = b_x.reshape(b_x.shape[0], b_x.shape[1], 28*28)
 x_test_flat = x_test.reshape(x_test.shape[0], x_test.shape[1], 28*28)
 
+single_bx, single_by = batch(fixed_x[:1], fixed_y[:1], 1)
 
 session_state = st.session_state
 
-kernel_sizes = [5, 3,3]
-kernel_filters = [4, 8, 8]
-params = {"kernel_info" : list(zip(kernel_sizes, kernel_filters)), "input_shape": (28, 28, 1), "output_size": 10}
-st.session_state.convmodel = ConvModel(params)
+st.write('Welcome to the demo of the feed forward model and gradient descent!')
 
+if st.button("Click to get an image to fit with gradient descent! (Rerun this if pre-fit prediction is same as truth)"):
+    img = single_bx[0][0]
+    truth = single_by[0]
+    st.session_state['bx'] = single_bx
+    st.session_state['by'] = single_by
+    st.session_state['crapmodel'] =  Model(28*28, 10, [ 8, 16])
+    fig, ax = plt.subplots()
+    ax.axis('off')
+    predicted = st.session_state.crapmodel.fd(np.array(img.flat))
 
-st.write('Welcome to the very minimal but functional demo of the feed forward model!')
+    st.session_state['prefit'] = np.argmax(predicted)
+    ax.set_title(f"Truth:{np.argmax(truth)} Pre-fit prediction:{np.argmax(predicted)}")
+    ax.imshow(img.reshape(28, 28))
+    st.pyplot(fig)
+
+if st.button("Click to fit the image with gradient descent"):
+    if st.session_state.get('crapmodel') == None: 
+        st.write("Get the image first!")
+    else:
+        img = st.session_state['bx'][0][0]
+        truth = st.session_state['by'][0]
+
+        for _epoch in range(10):
+            losses = st.session_state.crapmodel.train_epoch(st.session_state['bx'], st.session_state['by'], lr=1, timer=False, batch_timer=False)
+            st.write(f"Average loss for epoch {_epoch}: {sum(losses)/len(losses)}")
+        fig, ax = plt.subplots()
+
+        ax.axis('off')
+        predicted = st.session_state.crapmodel.fd(np.array(img.flat))
+        ax.set_title(f"Truth:{np.argmax(truth)} Pre-fit prediction: {st.session_state['prefit']} Post-fit prediction:{np.argmax(predicted)}")
+        ax.imshow(img.reshape(28, 28))
+        plt.show()
+        st.pyplot(fig)
+
+st.write('Now for the feed forward model!')
 st.write("first, set some hyperparameters. A known working combination that gets relatively quick results is lr=.1, softmax, and cross entropy for 5-7 epochs")
 lr= st.number_input("Learning rate")
 activation_fn=st.selectbox("Activation Function", options=["softmax", "sigmoid"])

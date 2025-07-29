@@ -10,8 +10,8 @@ import sys
 sys.path.append("..")  # or absolute path
 
 import streamlit as st
-# from basics.model import *
-from basics.CNN.CNN import *
+# from basics.model import * 
+from CNN.CNN import *
 import numpy as np
 import keras
 import matplotlib.pyplot as plt
