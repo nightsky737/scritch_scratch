@@ -17,7 +17,7 @@ class Operation(object):
         raise NotImplementedError
 
     def __call__(self, a, b):
-        """ Computes the forward pass of this operation: op(a, b) -> output"""
+        """ Computes the forward pass of this operation: op(a, b) -> output""" 
         raise NotImplementedError
 
     def backprop(self, grad, recursion=True, should_print=False):
