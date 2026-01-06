@@ -127,5 +127,5 @@ class JaxModel():
         acc = correct / len(testY[0])
         
         avg_loss = jnp.mean(jnp.array(losses))
-        print(f"Acc: {acc:.4f} Loss: {avg_loss:.4f}")
+        print(f"Loss: {avg_loss:.4f}")
         return losses, (acc, avg_loss)

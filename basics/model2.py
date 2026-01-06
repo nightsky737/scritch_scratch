@@ -110,7 +110,7 @@ class Model2():
             
             loss = np.sum((pred - y[input_idx]) ** 2)
             # num_correct += np.sum(np.argmax(pred, axis=1) == np.argmax(y[i], axis=1))
-            losses.append(loss.data)
+            losses.append(loss)
             for u in range(len(self.layers) -1, -1, -1):
                 # print("layer", u)
                 layer = self.layers[u]
@@ -156,7 +156,7 @@ class Model2():
             if batch_timer:
                 print(f"Elapsed time for one batch: { time.perf_counter()  - batch_start_time} seconds")
                 start_time = time.perf_counter()
-        # print(f"Acc: {num_correct/(y.shape[1] * len(y))} Avg loss: {sum(losses)/len(y)}")
+        print(f" Avg loss: {sum(losses)/len(losses)}")
         print(f"Elapsed time for one epoch: { time.perf_counter()  - full_start} seconds")
 
         return losses
